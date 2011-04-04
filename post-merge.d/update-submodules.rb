@@ -1,0 +1,1 @@
+../shared-hooks/update-submodules.rb
