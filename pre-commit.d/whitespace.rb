@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), %w{ .. lib shared })
+$: << '.'
+require File.join(File.dirname(__FILE__), *%w{ .. lib shared })
 
 `git rev-parse --verify HEAD`
 against = if $? == 0
