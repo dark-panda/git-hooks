@@ -1,0 +1,1 @@
+../shared-hooks/check-bundle.rb
