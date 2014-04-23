@@ -1,9 +1,28 @@
 
+require 'fileutils'
+
 COLOR_UI = `git config color.ui`.strip == 'true'
 
 # A default msg method in case the term-ansicolor gem isn't installed...
 def msg(m, fg = nil, bg = nil)
   m
+end
+
+def which(name)
+  found = false
+
+  paths = ENV["PATH"].split(File::PATH_SEPARATOR)
+  paths.unshift("#{FileUtils.pwd}/bin")
+
+  paths.each do |path|
+    file = File.join(path, name)
+
+    if File.executable?(file)
+      return file
+    end
+  end
+
+  false
 end
 
 if COLOR_UI
