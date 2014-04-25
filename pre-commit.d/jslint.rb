@@ -1,19 +1,16 @@
 #!/usr/bin/env ruby
 
-require 'shellwords'
-
 $: << '.'
 require File.join(File.dirname(__FILE__), *%w{ .. lib shared })
 
-if !(jslint = which('jslint'))
+if !(command = git_config(:'jslint-command')).empty?
+  jslint = command
+elsif !(jslint = which('jslint'))
   puts "ERROR: Can't find jslint on $PATH"
   exit(127)
 end
 
-status = `git status --porcelain`
-statuses_and_files = status.scan(/^\s*([AM]+)\s+(.+\.js)$/).compact
-statuses = statuses_and_files.collect(&:first)
-files = statuses_and_files.collect(&:last)
+statuses, files = git_statuses_and_files(/.+\.js/)
 
 if !files.empty?
   if statuses.include?('AM')

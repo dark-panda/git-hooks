@@ -1,5 +1,6 @@
 
 require 'fileutils'
+require 'shellwords'
 
 COLOR_UI = `git config color.ui`.strip == 'true'
 
@@ -23,6 +24,39 @@ def which(name)
   end
 
   false
+end
+
+def hook_type
+  ENV['HOOK_TYPE']
+end
+
+def hook_name
+  ENV['HOOK_NAME']
+end
+
+def git_statuses_and_files(*file_patterns)
+  file_patterns_regexp = if !file_patterns.empty?
+    /#{file_patterns.join('|')}/
+  else
+    /.+/
+  end
+
+  status = `git status --porcelain`
+  statuses_and_files = status.scan(/^([AM]+)\s+(#{file_patterns_regexp})$/)
+
+  [ statuses_and_files.collect(&:first), statuses_and_files.collect(&:last) ]
+end
+
+def git_diff(cached = false)
+  if cached
+    `git diff --cached`
+  else
+    `git diff`
+  end
+end
+
+def git_config(key)
+  `git config hooks.#{hook_type}.#{hook_name}.#{key}`.strip
 end
 
 if COLOR_UI

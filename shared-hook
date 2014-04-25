@@ -1,18 +1,19 @@
 #!/bin/sh
 
-HOOK_NAME=`basename $0`
+export HOOK_TYPE=`basename $0`
 
-if [ "`git config hooks.${HOOK_NAME}.enabled`" != 'true' ]; then
-  echo "Skipping ${HOOK_NAME}"
+if [ "`git config hooks.${HOOK_TYPE}.enabled`" != 'true' ]; then
+  echo "Skipping ${HOOK_TYPE}"
   exit 0
 fi
 
 if [ -d ${0}.d ]; then
   for i in ${0}.d/*; do
-    SUBHOOK_NAME=`basename $i | sed "s/\./-/g"`
+    export HOOK_NAME=`basename $i | sed "s/\./-/g"`
+
     if [ -x ${i} ]; then
-      if [ "`git config hooks.${HOOK_NAME}.${SUBHOOK_NAME}`" != 'true' ]; then
-        echo "Skipping ${HOOK_NAME} - ${SUBHOOK_NAME}"
+      if [ "`git config hooks.${HOOK_TYPE}.${HOOK_NAME}`" != 'true' ]; then
+        echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
       else
         ${i}
         RETVAL=$?
