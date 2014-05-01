@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-$: << '.'
-require File.join(File.dirname(__FILE__), %w{ .. lib shared })
+require_relative(File.join(*%w{ .. lib shared }))
 
 ROOT_DIR=`git rev-parse --show-cdup`.strip
 
