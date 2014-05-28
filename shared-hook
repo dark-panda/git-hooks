@@ -13,7 +13,9 @@ if [ -d ${0}.d ]; then
 
     if [ -x ${i} ]; then
       if [ "`git config hooks.${HOOK_TYPE}.${HOOK_NAME}`" != 'true' ]; then
-        echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
+        if [ "`git config hooks.verbose`" = "true" ]; then
+          echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
+        fi
       else
         ${i}
         RETVAL=$?
