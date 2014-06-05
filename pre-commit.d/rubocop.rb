@@ -6,12 +6,16 @@ statuses, files = git_statuses_and_files(/(.+(?:\.(?:rake|rb|builder|jbuilder|ru
 
 if !files.empty?
   begin
-    gem 'rubocop', '~> 0.21'
+    gem 'rubocop', '~> 0.23'
     require 'rubocop'
   rescue LoadError
-    puts "NOTE: Rubocop cannot be found. Please check your gem configuration or"
+    puts "NOTE: RuboCop cannot be found. Please check your gem configuration or"
     puts "disable the #{__FILE__} hook."
     exit(1)
+  end
+
+  if defined?(Rubocop)
+    RuboCop = Rubocop
   end
 
   class StyleGuide
@@ -34,28 +38,28 @@ if !files.empty?
     def investigate(parsed_file_content)
       unless parsed_file_content.valid_syntax?
         diagnostics = parsed_file_content.diagnostics
-        return Rubocop::Cop::Lint::Syntax.offenses_from_diagnostics(diagnostics)
+        return RuboCop::Cop::Lint::Syntax.offenses_from_diagnostics(diagnostics)
       end
 
-      team = Rubocop::Cop::Team.new(Rubocop::Cop::Cop.all, configuration)
-      commissioner = Rubocop::Cop::Commissioner.new(team.cops, team.forces)
+      team = RuboCop::Cop::Team.new(RuboCop::Cop::Cop.all, configuration)
+      commissioner = RuboCop::Cop::Commissioner.new(team.cops, team.forces)
       commissioner.investigate(parsed_file_content)
     end
 
     def parse_file_content(file_content)
-      Rubocop::SourceParser.parse(file_content)
+      RuboCop::SourceParser.parse(file_content)
     end
 
     def configuration
       if @config
         config = YAML.load(@config)
-        Rubocop::Config.new(config)
+        RuboCop::Config.new(config)
       elsif File.exists?('config/rubocop.yml')
-        Rubocop::ConfigLoader.load_file('config/rubocop.yml')
+        RuboCop::ConfigLoader.load_file('config/rubocop.yml')
       elsif File.exists?('.rubocop.yml')
-        Rubocop::ConfigLoader.load_file('.rubocop.yml')
+        RuboCop::ConfigLoader.load_file('.rubocop.yml')
       else
-        Rubocop::Config.new
+        RuboCop::Config.new
       end
     end
   end
@@ -64,9 +68,9 @@ if !files.empty?
 
   style_guide = StyleGuide.new
   diff = Hound::Diff.new(git_diff(:cached))
-  formatter = Rubocop::Formatter::ClangStyleFormatter.new($stdout)
+  formatter = RuboCop::Formatter::ClangStyleFormatter.new($stdout)
 
-  puts msg('Running Rubocop... ', 'yellow')
+  puts msg('Running RuboCop... ', 'yellow')
   puts "  Checking"
   puts "    #{files.join("\n    ")}"
 
