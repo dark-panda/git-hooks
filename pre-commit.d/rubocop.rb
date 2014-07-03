@@ -18,55 +18,9 @@ if !files.empty?
     RuboCop = Rubocop
   end
 
-  class StyleGuide
-    def initialize(config = nil)
-      @config = config
-    end
-
-    def violations(file_content)
-      investigate(parse_file_content(file_content))
-    end
-
-    def relevant_violations(file_content, patch)
-      violations(file_content).select do |violation|
-        patch.relevant_line?(violation.line)
-      end
-    end
-
-    private
-
-    def investigate(parsed_file_content)
-      unless parsed_file_content.valid_syntax?
-        diagnostics = parsed_file_content.diagnostics
-        return RuboCop::Cop::Lint::Syntax.offenses_from_diagnostics(diagnostics)
-      end
-
-      team = RuboCop::Cop::Team.new(RuboCop::Cop::Cop.all, configuration)
-      commissioner = RuboCop::Cop::Commissioner.new(team.cops, team.forces)
-      commissioner.investigate(parsed_file_content)
-    end
-
-    def parse_file_content(file_content)
-      RuboCop::SourceParser.parse(file_content)
-    end
-
-    def configuration
-      if @config
-        config = YAML.load(@config)
-        RuboCop::Config.new(config)
-      elsif File.exists?('config/rubocop.yml')
-        RuboCop::ConfigLoader.load_file('config/rubocop.yml')
-      elsif File.exists?('.rubocop.yml')
-        RuboCop::ConfigLoader.load_file('.rubocop.yml')
-      else
-        RuboCop::Config.new
-      end
-    end
-  end
-
   require_relative(File.join(*%w{ .. lib hound }))
 
-  style_guide = StyleGuide.new
+  style_guide = Hound::StyleGuide.new
   diff = Hound::Diff.new(git_diff(:cached))
   formatter = RuboCop::Formatter::ClangStyleFormatter.new($stdout)
 
