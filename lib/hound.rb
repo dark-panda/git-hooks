@@ -22,8 +22,7 @@ module Hound
 
     def investigate(parsed_file_content)
       unless parsed_file_content.valid_syntax?
-        diagnostics = parsed_file_content.diagnostics
-        return RuboCop::Cop::Lint::Syntax.offenses_from_diagnostics(diagnostics)
+        return RuboCop::Cop::Lint::Syntax.offenses_from_processed_source(parsed_file_content)
       end
 
       team = RuboCop::Cop::Team.new(RuboCop::Cop::Cop.all, configuration)
