@@ -6,7 +6,7 @@ statuses, files = git_statuses_and_files(/(.+(?:\.(?:rake|rb|builder|jbuilder|ru
 
 if !files.empty?
   begin
-    gem 'rubocop', '~> 0.26'
+    gem 'rubocop', '~> 0.27'
     require 'rubocop'
   rescue LoadError
     puts "NOTE: RuboCop cannot be found. Please check your gem configuration or"
