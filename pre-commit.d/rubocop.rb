@@ -2,52 +2,43 @@
 
 require_relative(File.join(*%w{ .. lib shared }))
 
+if !(command = git_config(:'rubocop-command')).empty?
+  rubocop = command
+elsif !(rubocop = which('rubocop'))
+  puts "ERROR: Can't find rubocop on $PATH"
+  exit(127)
+end
+
 statuses, files = git_statuses_and_files(/(.+(?:\.(?:rake|rb|builder|jbuilder|ru))|Gemfile|Rakefile|Guardfile|Capfile)/)
 
 if !files.empty?
-  begin
-    gem 'rubocop', '~> 0.27'
-    require 'rubocop'
-  rescue LoadError
-    puts "NOTE: RuboCop cannot be found. Please check your gem configuration or"
-    puts "disable the #{__FILE__} hook."
-    exit(1)
-  end
-
-  if defined?(Rubocop)
-    RuboCop = Rubocop
-  end
-
-  require_relative(File.join(*%w{ .. lib hound }))
-
-  style_guide = Hound::StyleGuide.new
-  diff = Hound::Diff.new(git_diff(:cached))
-  formatter = RuboCop::Formatter::ClangStyleFormatter.new($stdout)
-
-  puts msg('Running RuboCop... ', 'yellow')
-  puts "  Checking"
-  puts "    #{files.join("\n    ")}"
-
-  all_violations = files.each_with_object({}) do |file, memo|
-    patch = diff[file]
-    violations = style_guide.relevant_violations(File.read(file), patch)
-
-    if !violations.empty?
-      memo[file] = violations
-    end
-  end
-
-  if !all_violations.empty?
-    puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
-    puts "Ruby problems in commit! Take a gander at this:\n\n"
-
-    all_violations.each do |file, violations|
-      formatter.report_file(file, violations)
-    end
-
-    exit(1)
+  if statuses.include?('AM')
+    puts "ERROR: Looks like you've got partially staged Ruby code."
+    puts
+    puts "Running rubocop on partially staged code could lead to inaccurate"
+    puts "results. Please either stage the Ruby files directly or try"
+    puts "running rubocop on the Ruby files directly and if everything"
+    puts "looks good you can commit using \`--no-verify\`."
+    exit(127)
   else
-    puts "\n#{msg('OK!', 'green')}"
+    puts msg('Running jslint... ', 'yellow')
+    puts "  Checking"
+    puts "    #{files.join("\n    ")}"
+
+    cmd = "#{rubocop} #{files.collect { |file|
+      Shellwords.escape(file)
+    }.join(' ')}"
+
+    output = `#{cmd}`
+
+    if $? != 0
+      puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
+      puts "Ruby problems in commit! Take a gander at this:\n\n"
+      puts "#{output}\n\n"
+      exit(1)
+    else
+      puts "\n#{msg('OK!', 'green')}"
+    end
   end
 end
 
