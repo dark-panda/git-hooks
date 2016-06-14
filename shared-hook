@@ -2,6 +2,11 @@
 
 export HOOK_TYPE=`basename $0`
 
+if [ "`git config hooks.enabled`" = 'false' ]; then
+  echo "Skipping all hooks"
+  exit 0
+fi
+
 if [ "`git config hooks.${HOOK_TYPE}.enabled`" != 'true' ]; then
   echo "Skipping ${HOOK_TYPE}"
   exit 0
