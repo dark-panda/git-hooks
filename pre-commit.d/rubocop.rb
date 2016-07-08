@@ -21,7 +21,7 @@ if !files.empty?
     puts "looks good you can commit using \`--no-verify\`."
     exit(127)
   else
-    puts msg('Running jslint... ', 'yellow')
+    puts msg('Running rubocop... ', 'yellow')
     puts "  Checking"
     puts "    #{files.join("\n    ")}"
 
