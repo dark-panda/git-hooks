@@ -12,6 +12,8 @@ if [ "`git config hooks.${HOOK_TYPE}.enabled`" != 'true' ]; then
   exit 0
 fi
 
+RETVAL=0
+
 if [ -d ${0}.d ]; then
   for i in ${0}.d/*; do
     export HOOK_NAME=`basename $i | sed "s/\./-/g"`
@@ -22,12 +24,10 @@ if [ -d ${0}.d ]; then
           echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
         fi
       else
-        ${i}
-        RETVAL=$?
-        [ $RETVAL -ne 0 ] && exit $RETVAL
+        ${i} || RETVAL=$?
       fi
     fi
   done
 fi
 
-exit 0
+exit $RETVAL
