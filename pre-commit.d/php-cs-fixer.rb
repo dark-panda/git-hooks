@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-require_relative(File.join(*%w{ .. lib shared }))
+require 'pathname'
+require(File.join(Pathname.new(File.dirname(__FILE__)).realpath, *%w{ .. lib shared }))
 
 if !(command = git_config(:'php-cs-fixer-command')).empty?
   php_cs_fixer = command
