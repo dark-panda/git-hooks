@@ -9,6 +9,8 @@ else
   '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 end
 
+puts msg('Running whitespace checks... ', 'yellow')
+
 files = `git diff-index #{COLOR_UI ? '--color' : ''} --check --cached #{against}`
 unless $? == 0
   puts "#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
@@ -17,4 +19,5 @@ unless $? == 0
   exit(1)
 end
 
+puts "\n#{msg('OK!', 'green')}"
 exit(0)
