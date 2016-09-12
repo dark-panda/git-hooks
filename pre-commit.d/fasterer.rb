@@ -55,8 +55,9 @@ if !files.empty?
     end
 
     exit(exit_value) if exit_value
+
+    puts "\n#{msg('OK!', 'green')}"
   end
 end
 
-puts "\n#{msg('OK!', 'green')}"
 exit(0)
