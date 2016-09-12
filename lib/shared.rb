@@ -34,6 +34,10 @@ def hook_name
   ENV['HOOK_NAME']
 end
 
+def shared_path(*args)
+  File.join(File.dirname(__FILE__), *args)
+end
+
 def git_statuses_and_files(*file_patterns)
   file_patterns_regexp = if !file_patterns.empty?
     /#{file_patterns.join('|')}/

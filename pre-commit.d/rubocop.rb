@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
+require 'json'
 require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared })
+require shared_path('git_hooks/git_tools')
+require shared_path('git_hooks/rubocop')
 
 if !(command = git_config(:'rubocop-command')).empty?
   rubocop = command
@@ -25,21 +28,33 @@ if !files.empty?
     puts "  Checking"
     puts "    #{files.join("\n    ")}"
 
-    cmd = "#{rubocop} #{files.collect { |file|
+    cmd = "#{rubocop} --format json #{files.collect { |file|
       Shellwords.escape(file)
     }.join(' ')}"
 
     output = `#{cmd}`
 
     if $? != 0
-      puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
-      puts "Ruby problems in commit! Take a gander at this:\n\n"
-      puts "#{output}\n\n"
-      exit(1)
-    else
-      puts "\n#{msg('OK!', 'green')}"
+      diffs = GitHooks::GitTools::Diff.new(git_diff(:cached))
+      violations = GitHooks::Rubocop::Violations.new(output, diffs)
+
+      if violations.relevant_violations?
+        puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
+        puts "Ruby problems in commit! Take a gander at this:\n\n"
+
+        violations.relevant_violations.each do |file, violations|
+          violations.each do |violation|
+            puts "#{file}:#{violation.line_number}:#{violation.column_number}:#{violation.severity}: #{violation.message}"
+            puts "\t#{violation.line_content}"
+            puts
+          end
+        end
+
+        exit(1)
+      end
     end
   end
 end
 
+puts "\n#{msg('OK!', 'green')}"
 exit(0)
