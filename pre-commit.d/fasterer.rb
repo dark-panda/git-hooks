@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared }))
+require shared_path('git_hooks/git_tools')
+require shared_path('git_hooks/fasterer')
 
 if !(command = git_config(:'fasterer-command')).empty?
   fasterer = command
@@ -25,21 +27,36 @@ if !files.empty?
     puts "  Checking"
     puts "    #{files.join("\n    ")}"
 
-    cmd = "#{fasterer} #{files.collect { |file|
-      Shellwords.escape(file)
-    }.join(' ')}"
+    exit_value = nil
 
-    output = `#{cmd}`
+    files.each do |file|
+      cmd = "#{fasterer} #{Shellwords.escape(file)}"
+      output = `#{cmd}`
 
-    if $? != 0
+      next if $? == 0
+
+      diffs = GitHooks::GitTools::Diff.new(git_diff(:cached))
+      violations = GitHooks::Fasterer::Violations.new(output, diffs)
+
+      next unless violations.relevant_violations?
+
+      exit_value = 10
+
       puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
       puts "Ruby problems in commit! Take a gander at this:\n\n"
-      puts "#{output}\n\n"
-      exit(1)
-    else
-      puts "\n#{msg('OK!', 'green')}"
+
+      violations.relevant_violations.each do |file, violations|
+        violations.each do |violation|
+          puts "#{file}:#{violation.line_number}: #{violation.message}"
+          puts "\t#{violation.line_content}"
+          puts
+        end
+      end
     end
+
+    exit(exit_value) if exit_value
   end
 end
 
+puts "\n#{msg('OK!', 'green')}"
 exit(0)
