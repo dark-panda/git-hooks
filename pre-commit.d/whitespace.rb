@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'pathname'
-require(File.join(Pathname.new(File.dirname(__FILE__)).realpath, *%w{ .. lib shared }))
+require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared }))
 
 `git rev-parse --verify HEAD`
 against = if $? == 0
