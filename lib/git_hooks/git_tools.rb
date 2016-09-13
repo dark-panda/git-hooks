@@ -35,7 +35,7 @@ module GitHooks
     end
 
     class Patch
-      RANGE_INFORMATION_LINE = /^@@ .+\+(?<line_number>\d+),/
+      RANGE_INFORMATION_LINE = /^@@ .+\+(\d+),/
       MODIFIED_LINE = /^\+(?!\+|\+)/
       NOT_REMOVED_LINE = /^[^-]/
 
@@ -51,7 +51,7 @@ module GitHooks
         @additions = lines.each_with_index.inject([]) do |additions, (content, patch_position)|
           case content
           when RANGE_INFORMATION_LINE
-            line_number = Regexp.last_match[:line_number].to_i
+            line_number = Regexp.last_match[1].to_i
           when MODIFIED_LINE
             additions << Line.new(content, line_number, patch_position)
             line_number += 1

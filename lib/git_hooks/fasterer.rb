@@ -70,13 +70,15 @@ module GitHooks
       end
 
       def relevant_violations
-        @relevant_violations ||= @violations.each_with_object({}) do |(file, violations), memo|
+        @relevant_violations ||= @violations.reduce({}) do |memo, (file, violations)|
           violations.each do |offense|
             relevant_line = @diffs[file].relevant_line?(offense['line_number']) or next
 
             memo[file] ||= []
             memo[file] << Violation.new(offense, relevant_line)
           end
+
+          memo
         end
       end
     end

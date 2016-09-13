@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'json'
 require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared })
 require shared_path('git_hooks/git_tools')
