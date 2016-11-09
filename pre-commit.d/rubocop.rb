@@ -53,9 +53,9 @@ if !files.empty?
 
         exit(1)
       end
-
-      puts "\n#{msg('OK!', 'green')}"
     end
+
+    puts "\n#{msg('OK!', 'green')}"
   end
 end
 
