@@ -63,6 +63,10 @@ def git_config(key)
   `git config hooks.#{hook_type}.#{hook_name}.#{key}`.strip
 end
 
+def git_base_path
+  `git rev-parse --show-toplevel`.strip
+end
+
 if COLOR_UI
   begin
     require 'rubygems'
