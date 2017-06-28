@@ -1,29 +1,21 @@
 #!/usr/bin/env ruby
 
-require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared }))
+require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hooks }))
+require GitHooks.shared_path('git_hooks/git_utils')
 
-if !(command = git_config(:'php-cs-fixer-command')).empty?
-  php_cs_fixer = command
-elsif !(php_cs_fixer = which('php-cs-fixer'))
-  puts "ERROR: Can't find php-cs-fixer on $PATH"
-  exit(127)
-end
-
-statuses, files = git_statuses_and_files(/.+\.php/)
+php_cs_fixer = GitHooks.fetch_command('php-cs-fixer', 'php-cs-fixer')
+statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+\.php/)
 
 if !files.empty?
   if statuses.include?('AM')
-    puts "ERROR: Looks like you've got partially staged PHP."
-    puts
-    puts "Running php-cs-fixer on partially staged code could lead to inaccurate"
-    puts "results. Please either stage the PHP files directly or try"
-    puts "running php-cs-fixer on the PHP files directly and if everything"
-    puts "looks good you can commit using \`--no-verify\`."
+    puts GitHooks.partially_staged_code('PHP', 'php-cs-fixer')
     exit(127)
   else
-    puts msg('Running php-cs-fixer... ', 'yellow')
-    puts "  Checking"
-    puts "    #{files.join("\n    ")}"
+    puts <<~TEXT
+      #{GitHooks.running('php-cs-fixer')}
+
+      #{GitHooks.checking_files(files)}
+    TEXT
 
     outputs = []
     exit_statuses = []
@@ -37,7 +29,7 @@ if !files.empty?
     has_errors = !exit_statuses.map(&:to_i).all?(&:zero?)
 
     if has_errors
-      puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
+      puts GitHooks.whoa_there
       puts "PHP problems in commit! Take a gander at this:\n\n"
 
       outputs.each do |output|
@@ -46,7 +38,7 @@ if !files.empty?
 
       exit(1)
     else
-      puts "\n#{msg('OK!', 'green')}"
+      puts GitHooks.ok
     end
   end
 end

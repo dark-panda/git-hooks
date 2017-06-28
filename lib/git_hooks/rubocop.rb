@@ -1,6 +1,7 @@
 
-require shared_path('git_hooks/violation')
-require shared_path('git_hooks/violations')
+require 'json'
+require GitHooks.shared_path('git_hooks/violation')
+require GitHooks.shared_path('git_hooks/violations')
 
 module GitHooks
   module Rubocop

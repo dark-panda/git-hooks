@@ -1,7 +1,7 @@
 
 require 'rexml/document'
-require shared_path('git_hooks/violation')
-require shared_path('git_hooks/violations')
+require GitHooks.shared_path('git_hooks/violation')
+require GitHooks.shared_path('git_hooks/violations')
 
 module GitHooks
   module Checkstyle
@@ -16,7 +16,7 @@ module GitHooks
       end
 
       def fix_path(path)
-        path.sub(/^#{git_base_path}\/?/, '')
+        path.sub(/^#{GitHooks::GitUtils.git_base_path}\/?/, '')
       end
 
       def parse_violations(violations_xml)

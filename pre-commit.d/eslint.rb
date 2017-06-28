@@ -1,29 +1,21 @@
 #!/usr/bin/env ruby
 
-require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared }))
+require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hooks })
+require GitHooks.shared_path('git_hooks/git_utils')
 
-if !(command = git_config(:'eslint-command')).empty?
-  eslint = command
-elsif !(eslint = which('eslint'))
-  puts "ERROR: Can't find eslint on $PATH"
-  exit(127)
-end
-
-statuses, files = git_statuses_and_files(/.+(?:\.(?:js|es6))/)
+eslint = GitHooks.fetch_command('eslint', 'eslint')
+statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+(?:\.(?:js|es6))/)
 
 if !files.empty?
   if statuses.include?('AM')
-    puts "ERROR: Looks like you've got partially staged JavaScript/ES6."
-    puts
-    puts "Running eslint on partially staged code could lead to inaccurate"
-    puts "results. Please either stage the JavaScript/ES6 files directly or try"
-    puts "running eslint on the JavaScript/ES6 files directly and if everything"
-    puts "looks good you can commit using \`--no-verify\`."
+    puts GitHooks.partially_staged_code('JavaScript')
     exit(127)
   else
-    puts msg('Running eslint... ', 'yellow')
-    puts "  Checking"
-    puts "    #{files.join("\n    ")}"
+    puts <<~TEXT
+      #{GitHooks.running('eslint')}
+
+      #{GitHooks.checking_files(files)}
+    TEXT
 
     cmd = "#{eslint} #{files.collect { |file|
       Shellwords.escape(file)
@@ -32,12 +24,12 @@ if !files.empty?
     output = `#{cmd}`
 
     if $? != 0
-      puts "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')}, #{msg('/!\\', 'white', 'on_red')}\n\n"
+      puts GitHooks.whoa_there
       puts "JavaScript/ES6 problems in commit! Take a gander at this:\n\n"
       puts "#{output}\n\n"
       exit(1)
     else
-      puts "\n#{msg('OK!', 'green')}"
+      puts GitHooks.ok
     end
   end
 end
