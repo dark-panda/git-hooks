@@ -83,7 +83,7 @@ module GitHooks
   def checking_files(files)
     <<~TEXT
       Checking
-        #{files.join("\n    ")}
+        #{files.join("\n  ")}
     TEXT
   end
 
