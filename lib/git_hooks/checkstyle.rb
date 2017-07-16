@@ -30,7 +30,7 @@ module GitHooks
           violations['files'] ||= []
 
           file_violation = {
-            'path' => fix_path(file[:name]),
+            'path' => fix_path(file.attributes['name']),
             'offenses' => []
           }
 
@@ -38,11 +38,11 @@ module GitHooks
 
           file.elements.each('error') do |error|
             file_violation['offenses'] << {
-              'severity' => error[:severity],
-              'message' => error[:message],
+              'severity' => error.attributes['severity'],
+              'message' => error.attributes['message'],
               'location' => {
-                'line' => error[:line].to_i,
-                'column' => error[:column].to_i
+                'line' => error.attributes['line'].to_i,
+                'column' => error.attributes['column'].to_i
               }
             }
           end
