@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
 require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hooks })
+require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
+require GitHooks.shared_path('git_hooks/eslint')
 
 eslint = GitHooks.fetch_command('eslint', 'eslint')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+(?:\.(?:js|es6))/)
@@ -17,20 +19,24 @@ if !files.empty?
       #{GitHooks.checking_files(files)}
     TEXT
 
-    cmd = "#{eslint} #{files.collect { |file|
+    cmd = "#{eslint} --format json #{files.collect { |file|
       Shellwords.escape(file)
     }.join(' ')}"
 
     output = `#{cmd}`
 
     if $? != 0
-      puts GitHooks.whoa_there
-      puts "JavaScript/ES6 problems in commit! Take a gander at this:\n\n"
-      puts "#{output}\n\n"
-      exit(1)
-    else
-      puts GitHooks.ok
+      diffs = GitHooks::GitTools::Diff.new(GitHooks::GitUtils.git_diff(:cached))
+      violations = GitHooks::Eslint::Violations.new(output, diffs)
+
+      if violations.relevant_violations?
+        puts GitHooks.whoa_there
+        puts GitHooks.show_violations(violations)
+        exit(1)
+      end
     end
+
+    puts GitHooks.ok
   end
 end
 
