@@ -100,7 +100,7 @@ module GitHooks
 
   def show_violations(violations)
     text = <<~TEXT
-      Java problems in commit! Take a gander at this:
+      Problems in commit! Take a gander at this:
 
     TEXT
 
