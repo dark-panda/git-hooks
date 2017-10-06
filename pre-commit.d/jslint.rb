@@ -8,7 +8,7 @@ statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+\.js/)
 
 if !files.empty?
   if statuses.include?('AM')
-    puts GitHooks.partially_staged_code('JavaScript')
+    puts GitHooks.partially_staged_code('JavaScript', 'jslint')
     exit(127)
   else
     puts <<~TEXT

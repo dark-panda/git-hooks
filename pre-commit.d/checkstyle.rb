@@ -10,7 +10,7 @@ statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:java)))/
 
 if !files.empty?
   if statuses.include?('AM')
-    puts GitHooks.partially_staged_code('Java')
+    puts GitHooks.partially_staged_code('Java', 'checkstyle')
     exit(127)
   else
     puts <<~TEXT

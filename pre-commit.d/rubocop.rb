@@ -10,7 +10,7 @@ statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:rake|rb|
 
 if !files.empty?
   if statuses.include?('AM')
-    puts GitHooks.partially_staged_code('Ruby')
+    puts GitHooks.partially_staged_code('Ruby', 'rubocop')
     exit(127)
   else
     puts <<~TEXT
