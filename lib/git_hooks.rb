@@ -24,8 +24,6 @@ module GitHooks
   end
 
   def which(name)
-    found = false
-
     paths = ENV["PATH"].split(File::PATH_SEPARATOR)
     paths.unshift("#{FileUtils.pwd}/bin")
 
@@ -52,6 +50,8 @@ module GitHooks
     return unless command_fallback
 
     command = which(command_fallback)
+
+    return command if command
 
     puts "ERROR: Can't find #{command_fallback} on $PATH"
     exit(127)
