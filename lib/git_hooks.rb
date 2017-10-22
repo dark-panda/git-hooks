@@ -107,7 +107,7 @@ module GitHooks
     violations.relevant_violations.each do |file, violations|
       violations.each do |violation|
         text << <<~TEXT
-          #{file}:#{violation.line_number}:#{violation.column_number}:#{violation.severity}: #{violation.message}
+          #{[file, violation.line_number, violation.column_number, violation.severity].compact.join(':')}: #{violation.message}
           \ \ #{violation.line_content}
         TEXT
       end
