@@ -27,7 +27,7 @@ if !files.empty?
 
       next if $? == 0
 
-      diffs = GitHooks::GitTools::Diff.new(git_diff(:cached))
+      diffs = GitHooks::GitTools::Diff.new(GitHooks::GitUtils.git_diff(:cached))
       violations = GitHooks::Fasterer::Violations.new(output, diffs)
 
       next unless violations.relevant_violations?
