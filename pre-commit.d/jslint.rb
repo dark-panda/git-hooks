@@ -3,7 +3,6 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hooks })
 require GitHooks.shared_path('git_hooks/git_utils')
 
-jslint = GitHooks.fetch_command('jslint', 'jslint')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+\.js/)
 
 if !files.empty?
@@ -11,6 +10,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('JavaScript', 'jslint')
     exit(127)
   else
+    jslint = GitHooks.fetch_command('jslint', 'jslint')
+
     puts <<~TEXT
       #{GitHooks.running('jslint')}
 

@@ -5,7 +5,6 @@ require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
 require GitHooks.shared_path('git_hooks/reek')
 
-reek = GitHooks.fetch_command('reek', 'reek')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:rake|rb|builder|jbuilder|ru))|Gemfile|Rakefile|Guardfile|Capfile)/)
 
 if !files.empty?
@@ -13,6 +12,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('Ruby', 'reek')
     exit(127)
   else
+    reek = GitHooks.fetch_command('reek', 'reek')
+
     puts <<~TEXT
       #{GitHooks.running('reek')}
 

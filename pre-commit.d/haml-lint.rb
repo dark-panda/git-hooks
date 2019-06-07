@@ -5,7 +5,6 @@ require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
 require GitHooks.shared_path('git_hooks/haml_lint')
 
-haml_lint = GitHooks.fetch_command('haml-lint', 'haml-lint')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:haml)))/)
 
 if !files.empty?
@@ -13,6 +12,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('Haml', 'haml-lint')
     exit(127)
   else
+    haml_lint = GitHooks.fetch_command('haml-lint', 'haml-lint')
+
     puts <<~TEXT
       #{GitHooks.running('haml-lint')}
 

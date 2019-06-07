@@ -5,7 +5,6 @@ require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
 require GitHooks.shared_path('git_hooks/sass_lint')
 
-sass_lint = GitHooks.fetch_command('sass-lint', 'sass-lint')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:sass|scss)))/)
 
 if !files.empty?
@@ -13,6 +12,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('Sass', 'sass-lint')
     exit(127)
   else
+    sass_lint = GitHooks.fetch_command('sass-lint', 'sass-lint')
+
     puts <<~TEXT
       #{GitHooks.running('sass-lint')}
 

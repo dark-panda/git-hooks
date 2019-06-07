@@ -1,17 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib shared })
 require shared_path('git_hooks/git_tools')
-
-if !(command = git_config(:'erb-check-command')).empty?
-  erb_check = command
-elsif erb_check = which('erb')
-  erb_check = "#{erb_check} -x"
-else
-  puts "ERROR: Can't find erb on $PATH"
-  exit(127)
-end
 
 statuses, files = git_statuses_and_files(/(.+\.erb$)/)
 
@@ -25,6 +15,15 @@ if !files.empty?
     puts "looks good you can commit using \`--no-verify\`."
     exit(127)
   else
+    if !(command = git_config(:'erb-check-command')).empty?
+      erb_check = command
+    elsif erb_check = which('erb')
+      erb_check = "#{erb_check} -x"
+    else
+      puts "ERROR: Can't find erb on $PATH"
+      exit(127)
+    end
+
     puts msg('Running ERB checks... ', 'yellow')
     puts "  Checking"
     puts "    #{files.join("\n    ")}"

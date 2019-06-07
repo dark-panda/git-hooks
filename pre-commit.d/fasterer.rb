@@ -5,7 +5,6 @@ require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
 require GitHooks.shared_path('git_hooks/fasterer')
 
-fasterer = GitHooks.fetch_command('fasterer', 'fasterer')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/(.+(?:\.(?:rake|rb|builder|jbuilder|ru))|Gemfile|Rakefile|Guardfile|Capfile)/)
 
 if !files.empty?
@@ -13,6 +12,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('Ruby', 'fasterer')
     exit(127)
   else
+    fasterer = GitHooks.fetch_command('fasterer', 'fasterer')
+
     puts <<~TEXT
       #{GitHooks.running('fasterer')}
 

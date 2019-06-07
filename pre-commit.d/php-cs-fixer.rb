@@ -3,7 +3,6 @@
 require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hooks }))
 require GitHooks.shared_path('git_hooks/git_utils')
 
-php_cs_fixer = GitHooks.fetch_command('php-cs-fixer', 'php-cs-fixer')
 statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+\.php/)
 
 if !files.empty?
@@ -11,6 +10,8 @@ if !files.empty?
     puts GitHooks.partially_staged_code('PHP', 'php-cs-fixer')
     exit(127)
   else
+    php_cs_fixer = GitHooks.fetch_command('php-cs-fixer', 'php-cs-fixer')
+
     puts <<~TEXT
       #{GitHooks.running('php-cs-fixer')}
 
