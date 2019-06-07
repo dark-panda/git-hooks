@@ -15,7 +15,7 @@ module GitHooks
       def patches
         return @patches if defined?(@patches)
 
-        parts = @body.split(%r{^diff --git a/(?:.+) b/(.+)$})
+        parts = @body.force_encoding('BINARY').split(%r{^diff --git a/(?:.+) b/(.+)$})
         parts.shift
 
         @patches = {}
