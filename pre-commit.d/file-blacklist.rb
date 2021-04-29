@@ -14,7 +14,11 @@ if !files.empty?
   TEXT
 
   if File.exist?('.gitblacklist')
-    blacklisted_files = files & File.read('.gitblacklist').lines.collect(&:strip)
+    blacklisted_patterns = File.read('.gitblacklist').lines.collect(&:strip).flat_map do |pattern|
+      Dir.glob(pattern)
+    end
+
+    blacklisted_files = files & blacklisted_patterns
 
     if !blacklisted_files.empty?
       puts GitHooks.whoa_there
