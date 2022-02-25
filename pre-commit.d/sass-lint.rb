@@ -20,19 +20,32 @@ if !files.empty?
       #{GitHooks.checking_files(files)}
     TEXT
 
-    cmd = "#{sass_lint} --verbose --format json #{files.collect { |file|
-      Shellwords.escape(file)
-    }.join(' ')}"
+    outputs = []
+    exit_statuses = []
+    files.each { |file|
+      cmd = "#{sass_lint} --verbose --format json #{Shellwords.escape(file)}"
+      outputs << `#{cmd}`
+      exit_statuses << $?
+    }
 
-    output = `#{cmd}`
+    has_errors = !exit_statuses.map(&:to_i).all?(&:zero?)
+    should_exit = false
 
-    if !output.empty?
-      diffs = GitHooks::GitTools::Diff.new(GitHooks::GitUtils.git_diff(:cached))
-      violations = GitHooks::SassLint::Violations.new(output, diffs)
+    if !outputs.empty?
+      outputs.each do |output|
+        next if output.empty?
 
-      if violations.relevant_violations?
-        puts GitHooks.whoa_there
-        puts GitHooks.show_violations(violations)
+        diffs = GitHooks::GitTools::Diff.new(GitHooks::GitUtils.git_diff(:cached))
+        violations = GitHooks::SassLint::Violations.new(output, diffs)
+
+        if violations.relevant_violations?
+          puts GitHooks.whoa_there
+          puts GitHooks.show_violations(violations)
+          should_exit = true
+        end
+      end
+
+      if should_exit
         exit(1)
       end
     end
