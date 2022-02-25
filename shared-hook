@@ -24,7 +24,7 @@ if [ -d ${0}.d ]; then
           echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
         fi
       else
-        ${i} || RETVAL=$?
+        ${i} $@ || RETVAL=$?
       fi
     fi
   done

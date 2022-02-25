@@ -38,6 +38,10 @@ module GitHooks
       `git rev-parse --show-toplevel`.strip
     end
 
+    def git_current_branch
+      `git rev-parse --abbrev-ref HEAD`.strip
+    end
+
     extend self
   end
 end
