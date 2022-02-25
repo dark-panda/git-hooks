@@ -12,6 +12,16 @@ module GitHooks
         @violations = JSON.parse(violations_json)
         @diffs = diffs
       end
+
+      def violation_class
+        GitHooks::Rubocop::Violation
+      end
+    end
+
+    class Violation < GitHooks::Violation
+      def message
+        "#{offense['cop_name']} - #{offense['message']}"
+      end
     end
   end
 end

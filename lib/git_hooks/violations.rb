@@ -17,11 +17,15 @@ module GitHooks
           relevant_line = @diffs[violation['path']].relevant_line?(offense['location']['line']) or next
 
           memo[violation['path']] ||= []
-          memo[violation['path']] << Violation.new(offense, relevant_line)
+          memo[violation['path']] << violation_class.new(offense, relevant_line)
         end
 
         memo
       end
+    end
+
+    def violation_class
+      GitHooks::Violation
     end
   end
 end
