@@ -5,7 +5,7 @@ require GitHooks.shared_path('git_hooks/git_tools')
 require GitHooks.shared_path('git_hooks/git_utils')
 require GitHooks.shared_path('git_hooks/eslint')
 
-statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+(?:\.(?:js|es6))/)
+statuses, files = GitHooks::GitUtils.git_statuses_and_files(/.+(?:\.(?:js|es6|ts|tsx))/)
 
 if !files.empty?
   if statuses.include?('AM')
