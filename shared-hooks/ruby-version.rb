@@ -4,7 +4,7 @@ require(File.join(File.expand_path(File.dirname(__FILE__)), *%w{ .. lib git_hook
 
 ROOT_DIR=`git rev-parse --show-cdup`.strip
 
-if !File.exists?("#{ROOT_DIR}.ruby-version") && !File.exists?("#{ROOT_DIR}bin/ruby-version")
+if !File.exist?("#{ROOT_DIR}.ruby-version") && !File.exist?("#{ROOT_DIR}bin/ruby-version")
   exit(0)
 end
 
