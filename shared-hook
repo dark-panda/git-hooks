@@ -2,13 +2,21 @@
 
 export HOOK_TYPE=`basename $0`
 
+if [ "`git config hooks.verbose`" = "true" ]; then
+  HOOK_VERBOSE=1
+fi
+
 if [ "`git config hooks.enabled`" = 'false' ]; then
-  echo "Skipping all hooks"
+  if [ $HOOK_VERBOSE ]; then
+    echo "Skipping all hooks"
+  fi
   exit 0
 fi
 
 if [ "`git config hooks.${HOOK_TYPE}.enabled`" != 'true' ]; then
-  echo "Skipping ${HOOK_TYPE}"
+  if [ $HOOK_VERBOSE ]; then
+    echo "Skipping ${HOOK_TYPE}"
+  fi
   exit 0
 fi
 
@@ -20,7 +28,7 @@ if [ -d ${0}.d ]; then
 
     if [ -x ${i} ]; then
       if [ "`git config hooks.${HOOK_TYPE}.${HOOK_NAME}`" != 'true' ]; then
-        if [ "`git config hooks.verbose`" = "true" ]; then
+        if [ $HOOK_VERBOSE ]; then
           echo "Skipping ${HOOK_TYPE} - ${HOOK_NAME}"
         fi
       else
