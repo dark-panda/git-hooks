@@ -57,17 +57,6 @@ module GitHooks
     exit(127)
   end
 
-  def files_to_check
-    `git rev-parse --verify HEAD`
-    against = if $? == 0
-      'HEAD'
-    else
-      '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
-    end
-
-    `git diff-index #{COLOR_UI ? '--color' : ''} --check --cached #{against}`
-  end
-
   def whoa_there
     "\n#{msg('/!\\', 'white', 'on_red')} #{msg('WHOA THERE', 'red')} #{msg('/!\\', 'white', 'on_red')}\n\n"
   end
@@ -114,6 +103,14 @@ module GitHooks
     end
 
     text
+  end
+
+  def ignores(command_key)
+    return [] unless File.exist?('.githooksignores')
+
+    json = JSON.load_file('.githooksignores')
+
+    json[command_key] || []
   end
 
   extend self
